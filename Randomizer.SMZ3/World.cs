@@ -91,17 +91,13 @@ namespace Randomizer.SMZ3 {
             return region.CanEnter(items);
         }
 
-        public bool CanAquire(Progression items, RewardType reward) {
+        public bool CanAcquire(Progression items, RewardType reward) {
             // For the purpose of logic unit tests, if no region has the reward then CanAquire is satisfied
             return Regions.OfType<IReward>().FirstOrDefault(x => reward == x.Reward)?.CanComplete(items) ?? true;
         }
 
-        public bool CanAquireAll(Progression items, params RewardType[] rewards) {
-            return rewardLookup[rewards.Sum(x => (int)x)].All(x => x.CanComplete(items));
-        }
-
-        public bool CanAquireAllMask(Progression items, int bitMask) {
-            return rewardLookup[bitMask].All(x => x.CanComplete(items));
+        public bool CanAcquireAll(Progression items, RewardType rewardsMask) {
+            return rewardLookup[(int)rewardsMask].All(x => x.CanComplete(items));
         }
 
         public void Setup(Random rnd) {
