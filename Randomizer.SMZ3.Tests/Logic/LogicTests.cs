@@ -26,6 +26,8 @@ namespace Randomizer.SMZ3.Tests.Logic {
             foreach (var region in world.Regions.OfType<IReward>()) {
                 region.Reward = region.Reward == Agahnim ? Agahnim : None;
             }
+            /* After changing the rewards the lookup needs an update */
+            world.SetRewardLookup();
         }
 
         [TestFixture]

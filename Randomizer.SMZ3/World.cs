@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using static Randomizer.SMZ3.RewardType;
@@ -82,10 +81,7 @@ namespace Randomizer.SMZ3 {
             
             foreach(var region in Regions) {
                 region.GenerateLocationLookup();
-            }
-
-            rewardLookup = new Dictionary<int, IReward[]>();
-            
+            }            
         }
 
         public bool CanEnter(string regionName, Progression items) {
@@ -111,14 +107,10 @@ namespace Randomizer.SMZ3 {
         public void Setup(Random rnd) {
             SetMedallions(rnd);
             SetRewards(rnd);
-            
-            // Generate a lookup of all possible regions for any given reward combination for faster lookup later
-            for (int i = 0; i < 512; i++) {
-                rewardLookup.Add(i, Regions.OfType<IReward>().Where(x => (((int)x.Reward) & i) != 0).ToArray());
-            }
+            SetRewardLookup();
         }
 
-        private void SetMedallions(Random rnd) {
+        void SetMedallions(Random rnd) {
             foreach (var region in Regions.OfType<IMedallionAccess>()) {
                 region.Medallion = rnd.Next(3) switch {
                     0 => ItemType.Bombos,
@@ -128,7 +120,7 @@ namespace Randomizer.SMZ3 {
             }
         }
 
-        private void SetRewards(Random rnd) {
+        void SetRewards(Random rnd) {
             var rewards = new[] {
                 PendantGreen, PendantNonGreen, PendantNonGreen, CrystalRed, CrystalRed,
                 CrystalBlue, CrystalBlue, CrystalBlue, CrystalBlue, CrystalBlue,
@@ -136,6 +128,15 @@ namespace Randomizer.SMZ3 {
             foreach (var region in Regions.OfType<IReward>().Where(x => x.Reward == None)) {
                 region.Reward = rewards.First();
                 rewards.Remove(region.Reward);
+            }
+        }
+
+        // internal for logic unit tests
+        internal void SetRewardLookup() {
+            // Generate a lookup of all possible regions for any given reward combination for faster lookup later
+            rewardLookup = new Dictionary<int, IReward[]>();
+            for (var i = 0; i < 512; i += 1) {
+                rewardLookup.Add(i, Regions.OfType<IReward>().Where(x => (((int)x.Reward) & i) != 0).ToArray());
             }
         }
 
