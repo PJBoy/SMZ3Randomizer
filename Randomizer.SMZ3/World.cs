@@ -18,6 +18,8 @@ namespace Randomizer.SMZ3 {
             get { return Locations.Select(l => l.Item).Where(i => i != null); }
         }
 
+        public bool ForwardSearch { get; set; } = false;
+
         private Dictionary<int, IReward[]> rewardLookup { get; set; }
         private Dictionary<string, Location> locationLookup { get; set; }
         private Dictionary<string, Region> regionLookup { get; set; }
